@@ -10,47 +10,61 @@ contract Vaccine {
         string vaccine_type;
         uint first_dose_date;
         uint second_dose_date;
-    }
-    
-    struct Vacciene{
-        uint dose_dates;
-        string vaccine_type;
+        string[] vaxtypes;
+        uint[] vaxdates;
     }
     
     User[] records;
-    
-     /*function addVaccine (User u, VaccineRecord v) public returns (bool) {
-        User memory temp_user = u;
-        VaccineRecord memory temp_v = v;
-        bool found;
-        uint index; 
-        (found, index) = findUserIndex(temp_user.name, temp_user.birthday);
-        if(found){
-            User storage found_user = records[index];
-            found_user.doses = temp_v;
-            return true;
-        }else{
-            return false;
+
+    function addVaxxedUser(string memory name, uint birthday, string[] memory vaxtypes, uint[] memory vaxdates) public {
+        User memory newUser;
+        newUser.name = name;
+        newUser.birthday = birthday;
+        newUser.vaxtypes = new string[](vaxtypes.length);
+        for(uint i = 0; i< vaxtypes.length;i++){
+            newUser.vaxtypes[i] = vaxtypes[i];
         }
-    }*/
+        newUser.vaxdates = new uint[](vaxdates.length);
+        for(uint i = 0; i< vaxdates.length;i++){
+            newUser.vaxdates[i] = vaxdates[i];
+        }
+
+
+        /*for(uint i = 0; i<vaxtypes.length; i++){
+            string[] memory temp_vaxtypes[newUser.vaxtypes.length];
+            for(uint j = 0; j < newUser.vaxtypes.length; j++){
+                temp_vaxtypes[j] = newUser.vaxtypes[j];
+            }
+            newUser.vaxtypes = new string[](temp_vaxtypes.length+1);
+            for(uint j = 0; j < temp_vaxtypes.length; j++){
+                newUser.vaxtypes[j] = temp_vaxtypes[j];
+            }
+            newUser.vaxtypes[newUser.vaxtypes.length-1] = vaxtypes[i];
+        }*/
+        records.push(newUser);
+    }
     
-    
-    function addUser(string memory name, uint birthday, string memory vaccine_type, uint first_dose_date, uint secord_dose_date) public {
-        User memory newUser = User(name, birthday, vaccine_type, first_dose_date, secord_dose_date);
+    function addUser(string memory name, uint birthday, string memory vaccine_type, uint first_dose_date, uint second_dose_date) public {
+        User memory newUser;
+        newUser.name = name;
+        newUser.birthday = birthday;
+        newUser.vaccine_type = vaccine_type;
+        newUser.first_dose_date = first_dose_date;
+        newUser.second_dose_date = second_dose_date;
         records.push(newUser);
     }
     
     // Add first vaccine date?
     // If multiple matches, return all matches?
-    function findUser(string memory name, uint birthday) public view returns (string memory){
+    function findUser(string memory name, uint birthday) public view returns (User memory){
+        User memory ret;
         for (uint i=0; i<records.length; i++){
             if (keccak256(abi.encodePacked((name))) == keccak256(abi.encodePacked(records[i].name)) && 
                 keccak256(abi.encodePacked((birthday))) == keccak256(abi.encodePacked(records[i].birthday))){
-                return "found";
+                return records[i];
             }
         }
-        
-        return "not found";
+        return ret;
     }
 
      function findUserIndex(string memory name, uint birthday) public view returns (bool, uint){
