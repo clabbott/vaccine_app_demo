@@ -8,8 +8,6 @@ contract Vaccine {
         string name;
         uint birthday;
         string vaccine_type;
-        uint first_dose_date;
-        uint second_dose_date;
         string[] vaxtypes;
         uint[] vaxdates;
     }
@@ -28,30 +26,32 @@ contract Vaccine {
         for(uint i = 0; i< vaxdates.length;i++){
             newUser.vaxdates[i] = vaxdates[i];
         }
-
-
-        /*for(uint i = 0; i<vaxtypes.length; i++){
-            string[] memory temp_vaxtypes[newUser.vaxtypes.length];
-            for(uint j = 0; j < newUser.vaxtypes.length; j++){
-                temp_vaxtypes[j] = newUser.vaxtypes[j];
-            }
-            newUser.vaxtypes = new string[](temp_vaxtypes.length+1);
-            for(uint j = 0; j < temp_vaxtypes.length; j++){
-                newUser.vaxtypes[j] = temp_vaxtypes[j];
-            }
-            newUser.vaxtypes[newUser.vaxtypes.length-1] = vaxtypes[i];
-        }*/
         records.push(newUser);
     }
-    
-    function addUser(string memory name, uint birthday, string memory vaccine_type, uint first_dose_date, uint second_dose_date) public {
-        User memory newUser;
-        newUser.name = name;
-        newUser.birthday = birthday;
-        newUser.vaccine_type = vaccine_type;
-        newUser.first_dose_date = first_dose_date;
-        newUser.second_dose_date = second_dose_date;
-        records.push(newUser);
+
+    function addVaxToUser(string memory name, uint birthday, string memory vaxtype, uint vaxdate) public {
+        uint i = findUserIndex(name, birthday);
+        
+        string[] memory temp_vaxtypes = new string[](records[i].vaxtypes.length);
+        for(uint j = 0; j < records[i].vaxtypes.length; j++){
+            temp_vaxtypes[j] = records[i].vaxtypes[j];
+        }
+        records[i].vaxtypes = new string[](temp_vaxtypes.length+1);
+        for(uint j = 0; j < temp_vaxtypes.length; j++){
+            records[i].vaxtypes[j] = temp_vaxtypes[j];
+        }
+        records[i].vaxtypes[records[i].vaxtypes.length-1] = vaxtype;
+
+        uint[] memory temp_vaxdates = new uint[](records[i].vaxdates.length);
+        for(uint j = 0; j < records[i].vaxdates.length; j++){
+            temp_vaxdates[j] = records[i].vaxdates[j];
+        }
+        records[i].vaxdates = new uint[](temp_vaxdates.length+1);
+        for(uint j = 0; j < temp_vaxdates.length; j++){
+            records[i].vaxdates[j] = temp_vaxdates[j];
+        }
+        records[i].vaxdates[records[i].vaxdates.length-1] = vaxdate;
+
     }
     
     // Add first vaccine date?
@@ -67,14 +67,14 @@ contract Vaccine {
         return ret;
     }
 
-     function findUserIndex(string memory name, uint birthday) public view returns (bool, uint){
+     function findUserIndex(string memory name, uint birthday) public view returns (uint){
         for (uint i=0; i<records.length; i++){
             if (keccak256(abi.encodePacked((name))) == keccak256(abi.encodePacked(records[i].name)) && 
                 keccak256(abi.encodePacked((birthday))) == keccak256(abi.encodePacked(records[i].birthday))){
-                return (true, i);
+                return (i);
             }
         }
-        return (false, 0);
+        return (0);
     }
     
 }
